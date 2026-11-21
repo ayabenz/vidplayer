@@ -110,7 +110,7 @@
       if (navigator.vibrate) navigator.vibrate(12);
     }, 380);
   });
-
+/*
   stage.addEventListener('pointerup', e => {
     clearTimeout(lpTimer);
     if (longPressed) { longPressed = false; setRate(1); return; }
@@ -126,7 +126,27 @@
       seekBy((e.clientX - r.left) < r.width / 2 ? -STEP : STEP);
     }
   });
+*/
+  stage.addEventListener('pointerup', e => {
+    clearTimeout(lpTimer);
+    if (longPressed) { longPressed = false; setRate(1); return; }
+    if (Math.abs(e.clientX - downX) > 14 || Math.abs(e.clientY - downY) > 14) return;
 
+    tapCount++;
+    if (tapCount === 1) {
+      tapTimer = setTimeout(() => {
+        tapCount = 0;
+        togglePlay();   // klik tunggal = play / pause
+        showHud();
+      }, 250);
+    } else {
+      clearTimeout(tapTimer);
+      tapCount = 0;
+      const r = stage.getBoundingClientRect();
+      seekBy((e.clientX - r.left) < r.width / 2 ? -STEP : STEP);
+      showHud();
+    }
+  });
   stage.addEventListener('pointercancel', () => {
     clearTimeout(lpTimer);
     if (longPressed) { longPressed = false; setRate(1); }
@@ -179,8 +199,10 @@
   video.addEventListener('durationchange', () => { tDur.textContent = fmt(dur()); });
   video.addEventListener('timeupdate', () => { paint(video.currentTime, dur()); paintBuffer(); });
   video.addEventListener('progress', paintBuffer);
-  video.addEventListener('play', () => { btnPlay.innerHTML = ICON.pause; showHud(); });
-  video.addEventListener('pause', () => { btnPlay.innerHTML = ICON.play; showHud(); });
+  video.addEventListener('play', () => { stage.classList.add('playing'); btnPlay.innerHTML = ICON.pause; showHud(); });
+  video.addEventListener('pause', () => { stage.classList.remove('playing'); btnPlay.innerHTML = ICON.play; showHud(); });
+  //video.addEventListener('play', () => { btnPlay.innerHTML = ICON.pause; showHud(); });
+  //video.addEventListener('pause', () => { btnPlay.innerHTML = ICON.play; showHud(); });
   video.addEventListener('ended', showHud);
   video.addEventListener('error', () => { if (video.currentSrc) say('Gagal memuat video'); });
   video.addEventListener('contextmenu', e => e.preventDefault());

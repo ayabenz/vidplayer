@@ -70,3 +70,8 @@ input{padding:13px 14px;border-radius:10px;border:1px solid #2a2c35;background:#
 input:focus{outline:2px solid var(--acc);outline-offset:1px}
 form button{padding:13px;border-radius:10px;background:var(--acc);color:#04121f;font-weight:800;font-size:15px}
 .hint{color:#6d7280;font-size:12px}
+.center{position:absolute;z-index:2;width:84px;height:84px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(0,0,0,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  opacity:0;transform:scale(.9);transition:opacity .15s,transform .15s;pointer-events:none}
+.center svg{width:38px;height:38px;fill:#fff;margin-left:4px}
+.stage:not(.playing) .center{opacity:1;transform:scale(1)}
