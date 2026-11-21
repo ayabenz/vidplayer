@@ -1,0 +1,72 @@
+:root{--bg:#08080b;--fg:#f5f6f8;--dim:#a1a7b3;--acc:#3ea6ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;overscroll-behavior:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+[hidden]{display:none!important}
+
+.stage{position:fixed;inset:0;background:#000;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;display:flex;align-items:center;justify-content:center}
+video{width:100%;height:100%;object-fit:contain;background:#000;display:block}
+.stage.rotated video{position:absolute;top:50%;left:50%;width:100vh;height:100vw;max-width:none;transform:translate(-50%,-50%) rotate(90deg)}
+
+.hud{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;justify-content:space-between;
+  padding:10px;padding-top:calc(10px + env(safe-area-inset-top));padding-bottom:calc(10px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,0) 20%,rgba(0,0,0,0) 58%,rgba(0,0,0,.74));
+  transition:opacity .18s ease;pointer-events:none}
+.hud.hidden{opacity:0}
+.hud.hidden *{pointer-events:none!important}
+.hud .top,.hud .bottom{pointer-events:auto}
+
+.top{display:flex;align-items:center;gap:8px}
+.title{flex:1;min-width:0;font-size:13px;color:#dfe3ea;text-shadow:0 1px 3px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btns{display:flex;gap:6px}
+
+.btn{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.11);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .15s,transform .1s}
+.btn:active{transform:scale(.92);background:rgba(255,255,255,.24)}
+.btn svg{width:22px;height:22px}
+.btn svg.fill{fill:currentColor;stroke:none}
+.btn svg.stroke{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn.big{width:52px;height:52px}
+.btn.big svg{width:26px;height:26px}
+.btn.speed{width:auto;padding:0 13px;height:38px;border-radius:19px;font-weight:800;font-size:13px}
+.btn.speed.active{background:var(--acc);color:#04121f}
+
+.track{position:relative;height:28px;display:flex;align-items:center;margin-bottom:4px;touch-action:none;cursor:pointer}
+.track::before{content:"";position:absolute;left:0;right:0;height:4px;border-radius:2px;background:rgba(255,255,255,.22)}
+.buffered,.played{position:absolute;left:0;height:4px;border-radius:2px;width:0}
+.buffered{background:rgba(255,255,255,.32)}
+.played{background:var(--acc)}
+.knob{position:absolute;left:0;width:14px;height:14px;border-radius:50%;background:var(--acc);transform:translateX(-50%);
+  box-shadow:0 0 0 4px rgba(62,166,255,.22)}
+
+.row{display:flex;align-items:center;gap:8px}
+.time{font-size:12px;font-variant-numeric:tabular-nums;color:#cfd5de;text-shadow:0 1px 3px #000}
+.spacer{flex:1}
+
+.ripple{position:absolute;top:50%;z-index:2;width:96px;height:96px;border-radius:50%;background:rgba(0,0,0,.55);
+  display:grid;place-items:center;font-weight:800;font-size:13px;opacity:0;transform:translateY(-50%) scale(.85);
+  transition:opacity .18s,transform .18s;pointer-events:none}
+.ripple.left{left:6%}
+.ripple.right{right:6%}
+.ripple.show{opacity:1;transform:translateY(-50%) scale(1)}
+
+.badge{position:absolute;z-index:4;top:calc(14px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);
+  padding:4px 11px;border-radius:20px;background:var(--acc);color:#04121f;font-weight:800;font-size:12px;
+  opacity:0;transition:opacity .15s;pointer-events:none}
+.badge.show{opacity:1}
+
+.toast{position:absolute;z-index:5;bottom:calc(100px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
+  max-width:80%;text-align:center;background:rgba(0,0,0,.82);padding:8px 14px;border-radius:9px;font-size:13px;
+  opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+
+.empty{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:24px;
+  background:radial-gradient(circle at 50% 0%,#16171e,#08080b 70%)}
+form{width:100%;max-width:420px;display:grid;gap:12px}
+h1{margin:0;font-size:20px}
+p{margin:0;color:var(--dim);font-size:13px}
+input{padding:13px 14px;border-radius:10px;border:1px solid #2a2c35;background:#12131a;color:var(--fg);font-size:15px}
+input:focus{outline:2px solid var(--acc);outline-offset:1px}
+form button{padding:13px;border-radius:10px;background:var(--acc);color:#04121f;font-weight:800;font-size:15px}
+.hint{color:#6d7280;font-size:12px}

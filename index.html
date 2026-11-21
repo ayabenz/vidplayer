@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#08080b" />
+    <title>Player</title>
+  </head>
+  <body>
+    <link rel="stylesheet" href="styles.css" />
+
+    <div class="stage" id="stage">
+      <video
+        id="video"
+        playsinline
+        webkit-playsinline
+        preload="metadata"
+      ></video>
+
+      <div class="ripple left" id="ripL">−10s</div>
+      <div class="ripple right" id="ripR">+10s</div>
+      <div class="badge" id="badge">2×</div>
+      <div class="toast" id="toast"></div>
+
+      <div class="hud" id="hud">
+        <div class="top">
+          <div class="title" id="title">Video</div>
+          <div class="btns">
+            <button class="btn" id="btnRotate" aria-label="Putar orientasi">
+              <svg class="stroke" viewBox="0 0 24 24">
+                <rect x="8" y="3" width="8" height="18" rx="2" />
+                <path d="M4 8v8M20 8v8" />
+              </svg>
+            </button>
+            <button class="btn" id="btnFs" aria-label="Layar penuh">
+              <svg class="stroke" viewBox="0 0 24 24">
+                <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+              </svg>
+            </button>
+            <button class="btn" id="btnDl" aria-label="Unduh video">
+              <svg class="stroke" viewBox="0 0 24 24">
+                <path d="M12 4v10M8 10l4 4 4-4M5 19h14" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <div class="track" id="track">
+            <div class="buffered" id="buffered"></div>
+            <div class="played" id="played"></div>
+            <div class="knob" id="knob"></div>
+          </div>
+          <div class="row">
+            <button class="btn big" id="btnPlay" aria-label="Putar atau jeda">
+              <svg class="fill" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+            <button class="btn" id="btnMute" aria-label="Suara">
+              <svg class="stroke" viewBox="0 0 24 24">
+                <path d="M4 9v6h4l5 4V5L8 9H4z" />
+                <path d="M16.5 8.5a5 5 0 0 1 0 7" />
+              </svg>
+            </button>
+            <button
+              class="btn speed"
+              id="btnSpeed"
+              aria-label="Tahan untuk 2 kali kecepatan"
+            >
+              2×
+            </button>
+            <div class="time">
+              <span id="tCur">0:00</span> / <span id="tDur">0:00</span>
+            </div>
+            <div class="spacer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty" id="empty" hidden>
+      <form id="form">
+        <h1>Video Player</h1>
+        <p>Tempel URL video langsung (mp4 / webm / ogg).</p>
+        <input
+          id="urlInput"
+          type="url"
+          inputmode="url"
+          placeholder="https://contoh.com/video.mp4"
+          required
+        />
+        <button type="submit">Putar</button>
+        <div class="hint">Format tautan: <code>/?url=URL_VIDEO</code></div>
+      </form>
+    </div>
+
+    <script src="player.js" defer></script>
+  </body>
+</html>
