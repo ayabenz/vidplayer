@@ -205,6 +205,10 @@
   //video.addEventListener('play', () => { btnPlay.innerHTML = ICON.pause; showHud(); });
   //video.addEventListener('pause', () => { btnPlay.innerHTML = ICON.play; showHud(); });
   video.addEventListener('ended', showHud);
+  video.addEventListener('waiting', () => track.classList.add('loading'));
+  video.addEventListener('playing', () => track.classList.remove('loading'));
+  video.addEventListener('canplay', () => track.classList.remove('loading'));
+  video.addEventListener('canplaythrough', () => track.classList.remove('loading'));
   const ERR_MSG = {
     1: 'Putaran dibatalkan oleh pengguna.',
     2: 'Gagal mengambil data video (jaringan).',
