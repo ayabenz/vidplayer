@@ -86,9 +86,10 @@
     if (r === 1) badge.classList.remove('show');
     else { badge.textContent = r + '×'; badge.classList.add('show'); }
   }
-  function flashRipple(side) {
+  function flashRipple(side, count) {
     const el = side === 'R' ? ripR : ripL;
-    el.textContent = (side === 'R' ? '+' : '−') + STEP + 's';
+    const total = STEP * (count || 1);
+    el.textContent = (side === 'R' ? '+' : '−') + total + 's';
     el.classList.add('show');
     clearTimeout(el._t);
     el._t = setTimeout(() => el.classList.remove('show'), 550);
@@ -100,7 +101,7 @@
     flashRipple(d > 0 ? 'R' : 'L');
   }
 
-  let lpTimer = null, longPressed = false, tapCount = 0, tapTimer = null, downX = 0, downY = 0;
+  let lpTimer = null, longPressed = false, tapCount = 0, tapTimer = null, downX = 0, downY = 0, lastTapSide = null;
 
   stage.addEventListener('pointerdown', e => {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -135,19 +136,22 @@
     if (Math.abs(e.clientX - downX) > 14 || Math.abs(e.clientY - downY) > 14) return;
 
     tapCount++;
-    if (tapCount === 1) {
-      tapTimer = setTimeout(() => {
-        tapCount = 0;
+    const r = stage.getBoundingClientRect();
+    lastTapSide = (e.clientX - r.left) < r.width / 2 ? 'L' : 'R';
+
+    clearTimeout(tapTimer);
+    tapTimer = setTimeout(() => {
+      if (tapCount === 1) {
         togglePlay();   // klik tunggal = play / pause
-        showHud();
-      }, 250);
-    } else {
-      clearTimeout(tapTimer);
+      } else {
+        const dir = lastTapSide === 'R' ? 1 : -1;
+        seekBy(dir * STEP * tapCount);
+        flashRipple(lastTapSide, tapCount);
+      }
       tapCount = 0;
-      const r = stage.getBoundingClientRect();
-      seekBy((e.clientX - r.left) < r.width / 2 ? -STEP : STEP);
+      lastTapSide = null;
       showHud();
-    }
+    }, 300);
   });
   stage.addEventListener('pointercancel', () => {
     clearTimeout(lpTimer);
