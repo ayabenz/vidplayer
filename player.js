@@ -14,7 +14,8 @@
         tCur = $('tCur'), tDur = $('tDur'), badge = $('badge'), toast = $('toast'),
         ripL = $('ripL'), ripR = $('ripR'), title = $('title'), empty = $('empty'),
         btnPlay = $('btnPlay'), btnMute = $('btnMute'), btnSpeed = $('btnSpeed'),
-        btnRotate = $('btnRotate'), btnFs = $('btnFs'), btnDl = $('btnDl');
+        btnRotate = $('btnRotate'), btnFs = $('btnFs'), btnDl = $('btnDl'),
+        loadPct = $('loadPct');
 
   const RATE = 2, STEP = 10;
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -194,6 +195,10 @@
       if (video.buffered.start(i) <= video.currentTime + 1) end = Math.max(end, video.buffered.end(i));
     }
     buffered.style.width = clamp(end / d, 0, 1) * 100 + '%';
+    if (track.classList.contains('loading')) {
+      const pct = Math.round(clamp(end / d, 0, 1) * 100);
+      loadPct.textContent = pct + '%';
+    }
   }
 
   video.addEventListener('loadedmetadata', () => { tDur.textContent = fmt(dur()); showHud(); });
