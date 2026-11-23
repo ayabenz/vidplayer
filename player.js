@@ -61,6 +61,7 @@
     video.src = src;
     if (poster) video.poster = poster;
     title.textContent = fileName(src);
+    probeMimeType(src);
   }
 
   let hideTimer;
@@ -210,6 +211,30 @@
     3: 'Gagal mendekode video (format tidak didukung / rusak).',
     4: 'Format video tidak didukung oleh browser.'
   };
+  const VIDEO_MIME = ['video/mp4', 'video/webm', 'video/ogg', 'video/x-matroska', 'application/x-mpegURL', 'application/vnd.apple.mpegurl', 'application/dash+xml'];
+
+  function isVideoMime(type) {
+    if (!type) return false;
+    return VIDEO_MIME.some(m => type.toLowerCase().startsWith(m.split('/')[0] + '/') || type.toLowerCase().startsWith(m));
+  }
+
+  async function probeMimeType(src) {
+    if (!src) return;
+    try {
+      const res = await fetch(src, { method: 'HEAD', mode: 'cors' });
+      const ct = res.headers.get('content-type') || '';
+      console.debug('[player] probe HEAD', src, '->', ct, res.status);
+      if (res.status >= 400) {
+        say('Server merespon ' + res.status + ' (' + res.statusText + ')');
+      } else if (!isVideoMime(ct)) {
+        say('Server mengirim tipe bukan video: ' + ct || '(kosong)');
+      }
+    } catch (err) {
+      console.debug('[player] probe gagal:', err);
+      // Tidak bisa dicek (misalnya CORS/blokir), biarkan video elemen sendiri yang menangani
+    }
+  }
+
   function debugErr() {
     const e = video.error;
     if (!e) return;
@@ -219,7 +244,18 @@
     console.log('src  :', video.currentSrc || '-');
     console.log('type :', video.currentType || '-');
     console.groupEnd();
-    const desc = ERR_MSG[e.code] || 'Terjadi kesalahan saat memutar video.';
+
+    let desc = ERR_MSG[e.code] || 'Terjadi kesalahan saat memutar video.';
+    const ct = video.currentType || '';
+
+    if (e.code === 4) {
+      if (!ct) desc = 'Browser tidak mendapatkan tipe konten video dari server.';
+      else if (!isVideoMime(ct)) desc = 'Server mengirim tipe bukan video: ' + ct;
+      else desc = 'Codec video dalam file ini tidak didukung oleh browser.';
+    } else if (e.code === 2 && ct && !isVideoMime(ct)) {
+      desc = 'Gagal mengambil data (tipe konten tidak valid: ' + ct + ').';
+    }
+
     const msg = e.message ? desc + ' (' + e.message + ')' : desc;
     say(msg);
   }
