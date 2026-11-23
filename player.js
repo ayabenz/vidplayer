@@ -204,7 +204,27 @@
   //video.addEventListener('play', () => { btnPlay.innerHTML = ICON.pause; showHud(); });
   //video.addEventListener('pause', () => { btnPlay.innerHTML = ICON.play; showHud(); });
   video.addEventListener('ended', showHud);
-  video.addEventListener('error', () => { if (video.currentSrc) say('Gagal memuat video'); });
+  const ERR_MSG = {
+    1: 'Putaran dibatalkan oleh pengguna.',
+    2: 'Gagal mengambil data video (jaringan).',
+    3: 'Gagal mendekode video (format tidak didukung / rusak).',
+    4: 'Format video tidak didukung oleh browser.'
+  };
+  function debugErr() {
+    const e = video.error;
+    if (!e) return;
+    console.group('▶ [player] video error');
+    console.log('code :', e.code);
+    console.log('msg  :', e.message || '-');
+    console.log('src  :', video.currentSrc || '-');
+    console.log('type :', video.currentType || '-');
+    console.groupEnd();
+    const desc = ERR_MSG[e.code] || 'Terjadi kesalahan saat memutar video.';
+    const msg = e.message ? desc + ' (' + e.message + ')' : desc;
+    say(msg);
+  }
+  video.addEventListener('error', debugErr);
+  video.addEventListener('loadedmetadata', () => { tDur.textContent = fmt(dur()); showHud(); });
   video.addEventListener('contextmenu', e => e.preventDefault());
 
   function bind(el, fn) {
@@ -214,7 +234,11 @@
 
   async function togglePlay() {
     if (video.paused) {
-      try { await video.play(); } catch { say('Tidak bisa memutar'); }
+      console.debug('[player] play() src=', video.currentSrc);
+      try { await video.play(); } catch (err) {
+        console.debug('[player] play() rejected:', err);
+        say(video.error ? (ERR_MSG[video.error.code] || 'Gagal memutar video') : 'Tidak bisa memutar video');
+      }
     } else video.pause();
   }
 
