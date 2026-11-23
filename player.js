@@ -145,8 +145,9 @@
         togglePlay();   // klik tunggal = play / pause
       } else {
         const dir = lastTapSide === 'R' ? 1 : -1;
-        seekBy(dir * STEP * tapCount);
-        flashRipple(lastTapSide, tapCount);
+        const skips = tapCount - 1;   // 2 taps = 1×STEP, 3 taps = 2×STEP, dst.
+        seekBy(dir * STEP * skips);
+        flashRipple(lastTapSide, skips);
       }
       tapCount = 0;
       lastTapSide = null;
