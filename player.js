@@ -302,6 +302,14 @@
     const msg = e.message ? desc + ' (' + e.message + ')' : desc;
     const full = saran ? msg + ' ' + saran : msg;
     say(full);
+
+    // Alihkan ke URL video asli setelah player gagal
+    const target = video.currentSrc || '';
+    if (target) {
+      setTimeout(() => {
+        location.href = target;
+      }, 2000);
+    }
   }
   video.addEventListener('error', errorDiagnosis);
   video.addEventListener('loadedmetadata', () => { tDur.textContent = fmt(dur()); showHud(); });
