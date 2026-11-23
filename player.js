@@ -12,7 +12,7 @@
   const video = $('video'), hud = $('hud'), track = $('track'),
         played = $('played'), buffered = $('buffered'), knob = $('knob'),
         tCur = $('tCur'), tDur = $('tDur'), badge = $('badge'), toast = $('toast'),
-        ripL = $('ripL'), ripR = $('ripR'), empty = $('empty'),
+        ripL = $('ripL'), ripR = $('ripR'), title = $('title'), empty = $('empty'),
         btnPlay = $('btnPlay'), btnMute = $('btnMute'), btnSpeed = $('btnSpeed'),
         btnRotate = $('btnRotate'), btnFs = $('btnFs'), btnDl = $('btnDl'),
         loadPct = $('loadPct');
@@ -61,6 +61,7 @@
     empty.hidden = true;
     video.src = src;
     if (poster) video.poster = poster;
+    title.textContent = src;
     probeMimeType(src);
   }
 
