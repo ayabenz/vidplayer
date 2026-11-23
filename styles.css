@@ -18,7 +18,7 @@ video{width:100%;height:100%;object-fit:contain;background:#000;display:block}
 .hud .top,.hud .bottom{pointer-events:auto}
 
 .top{display:flex;align-items:center;gap:8px}
-.title{flex:1;min-width:0;font-size:13px;color:#dfe3ea;text-shadow:0 1px 3px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
 .btns{display:flex;gap:6px}
 
 .btn{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.11);
