@@ -236,31 +236,74 @@
     }
   }
 
-  function debugErr() {
+  const NET_STATE = {
+    0: 'EMPTY (belum ada data)',
+    1: 'IDLE (siap, belum dimuat)',
+    2: 'LOADING (mengunduh data)',
+    3: 'NO_SOURCE (tidak ada sumber)'
+  };
+  const READY_STATE = {
+    0: 'HAVE_NOTHING',
+    1: 'HAVE_METADATA',
+    2: 'HAVE_CURRENT_DATA',
+    3: 'HAVE_FUTURE_DATA',
+    4: 'HAVE_ENOUGH_DATA'
+  };
+
+  function errorDiagnosis() {
     const e = video.error;
-    if (!e) return;
+    const ct = video.currentType || '';
+    const src = video.currentSrc || '';
+    const isCrossOrigin = src && new URL(src, location.href).origin !== location.origin;
+
     console.group('▶ [player] video error');
-    console.log('code :', e.code);
-    console.log('msg  :', e.message || '-');
-    console.log('src  :', video.currentSrc || '-');
-    console.log('type :', video.currentType || '-');
+    console.log('code        :', e.code);
+    console.log('msg         :', e.message || '-');
+    console.log('src         :', src);
+    console.log('type        :', ct);
+    console.log('networkState:', video.networkState, '(' + NET_STATE[video.networkState] + ')');
+    console.log('readyState  :', video.readyState, '(' + READY_STATE[video.readyState] + ')');
+    console.log('crossOrigin :', isCrossOrigin);
     console.groupEnd();
 
     let desc = ERR_MSG[e.code] || 'Terjadi kesalahan saat memutar video.';
-    const ct = video.currentType || '';
+    let saran = '';
 
     if (e.code === 4) {
-      if (!ct) desc = 'Browser tidak mendapatkan tipe konten video dari server.';
-      else if (!isVideoMime(ct)) desc = 'Server mengirim tipe bukan video: ' + ct;
-      else desc = 'Codec video dalam file ini tidak didukung oleh browser.';
-    } else if (e.code === 2 && ct && !isVideoMime(ct)) {
-      desc = 'Gagal mengambil data (tipe konten tidak valid: ' + ct + ').';
+      if (!ct) {
+        desc = 'Browser tidak menerima tipe konten video dari server.';
+        saran = 'Pastikan URL langsung ke file video (bukan halaman HTML) dan server mengirim Content-Type video/mp4.';
+      } else if (!isVideoMime(ct)) {
+        desc = 'Server mengirim tipe bukan video: ' + ct;
+        saran = 'URL mungkin mengarah ke halaman HTML alih-alih file video.';
+      } else {
+        desc = 'Codec video dalam file ini tidak didukung oleh browser.';
+        saran = 'Gunakan MP4 dengan codec H.264 + AAC untuk kompatibilitas terbaik.';
+      }
+    } else if (e.code === 2) {
+      if (isCrossOrigin) {
+        desc = 'Gagal mengambil data video (jaringan / diblokir server).';
+        saran = 'Server mungkin memblokir pemutaran langsung dari luar (hotlink protection). Coba buka URL di tab browser terlebih dahulu.';
+      } else {
+        desc = 'Gagal mengambil data video (jaringan).';
+        saran = 'Periksa koneksi internet dan apakah URL masih aktif.';
+      }
+    } else if (e.code === 3) {
+      desc = 'Gagal mendekode video (format tidak didukung / rusak).';
+      saran = 'File mungkin rusak atau codec tidak didukung browser.';
+    } else if (e.code === 1) {
+      desc = 'Putaran dibatalkan oleh pengguna.';
+    }
+
+    if (video.networkState === 3) {
+      saran += ' (Sumber video tidak ditemukan / tidak valid.)';
     }
 
     const msg = e.message ? desc + ' (' + e.message + ')' : desc;
-    say(msg);
+    const full = saran ? msg + ' ' + saran : msg;
+    say(full);
   }
-  video.addEventListener('error', debugErr);
+  video.addEventListener('error', errorDiagnosis);
   video.addEventListener('loadedmetadata', () => { tDur.textContent = fmt(dur()); showHud(); });
   video.addEventListener('contextmenu', e => e.preventDefault());
 
@@ -274,7 +317,8 @@
       console.debug('[player] play() src=', video.currentSrc);
       try { await video.play(); } catch (err) {
         console.debug('[player] play() rejected:', err);
-        say(video.error ? (ERR_MSG[video.error.code] || 'Gagal memutar video') : 'Tidak bisa memutar video');
+        if (video.error) errorDiagnosis();
+        else say('Tidak bisa memutar video');
       }
     } else video.pause();
   }
