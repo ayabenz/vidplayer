@@ -230,8 +230,9 @@
         say('Server mengirim tipe bukan video: ' + ct || '(kosong)');
       }
     } catch (err) {
-      console.debug('[player] probe gagal:', err);
-      // Tidak bisa dicek (misalnya CORS/blokir), biarkan video elemen sendiri yang menangani
+      // CORS atau jaringan memblokir pemeriksaan HEAD — tidak perlu memunculkan toast,
+      // karena video elemen masih bisa memutar cross-origin tanpa CORS.
+      console.debug('[player] probe dibatalkan (CORS/jaringan):', err);
     }
   }
 
@@ -312,7 +313,7 @@
     const name = fileName(src);
     try {
       const res = await fetch(src, { mode: 'cors' });
-      if (!res.ok) throw new Error('bad');
+      if (!res.ok) throw new Error('fetch gagal');
       const blob = await res.blob();
       const objUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -324,13 +325,14 @@
       setTimeout(() => URL.revokeObjectURL(objUrl), 15000);
       say('Mengunduh…');
     } catch {
+      // CORS diblokir oleh server — fallback: buka/download langsung via tautan.
       const a = document.createElement('a');
       a.href = src;
       a.download = name;
       a.target = '_blank';
       a.rel = 'noopener';
       a.click();
-      say('Membuka video di tab baru');
+      say('Membuka video di tab baru (CORS diblokir)');
     }
   }
 
